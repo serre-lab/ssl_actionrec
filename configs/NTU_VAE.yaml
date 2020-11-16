@@ -1,0 +1,34 @@
+path_db: '../ssl_db'
+model: 'VAEPC'
+dataset: 'NTU_SSL'
+# trainer
+gpus: 1
+batch_size: 128
+max_epochs: 80
+num_workers: 2
+flush_logs_every_n_steps: 200
+log_every_n_steps: 100
+ckpt_period: 3
+# model
+optimizer: adam
+learning_rate: 0.001
+gradient_clip_val: 25 # 5
+output_feature: 'seqlast'
+#arch
+bidirectional: False
+input_dim: 150
+input_embedding: null
+hidden_dim: 512
+latent_dim: 512
+cell: 'GRU'
+num_layers: 1
+beta: 0.01
+# data
+train_split: '../NTU/NTU60/xsub/NTU_train_seqs.npy'
+train_split_labels: '../NTU/NTU60/xsub/NTU_train_labels.npy'
+train_transforms: null
+val_split: '../NTU/NTU60/xsub/NTU_val_seqs.npy'
+val_split_labels: '../NTU/NTU60/xsub/NTU_val_labels.npy'
+val_transforms: null
+drop_last: False
+shuffle: True

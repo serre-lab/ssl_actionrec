@@ -1,0 +1,44 @@
+path_db: '../ssl_db'
+model: 'TDCon'
+dataset: 'NTU_SSL'
+# trainer
+gpus: 1
+batch_size: 64
+max_epochs: 81
+num_workers: 4
+flush_logs_every_n_steps: 100
+log_every_n_steps: 50
+ckpt_period: 3
+# model
+gradient_clip_val: 25
+optimizer: adam
+# emb_dim: 128
+num_negatives: 128
+encoder_momentum: 0.999
+maximum_timesteps: 300
+softmax_temperature: 0.1
+learning_rate: 0.003 #0.03
+momentum: 0.9
+weight_decay: 0.0001
+output_feature: 'seqlast'
+epochs: 81
+lr_decay_rate: 0.1
+decoder_input: 'seqlast'
+con_weight: 1
+rec_weight: 55
+#arch
+bidirectional: False
+input_dim: 150
+input_embedding: null
+hidden_dim: 512
+cell: 'GRU'
+num_layers: 1
+# data
+train_split: '../NTU/NTU60/xsub/NTU_train_seqs.npy'
+train_split_labels: '../NTU/NTU60/xsub/NTU_train_labels.npy'
+train_transforms: NTUMocoTDTrainTransformsTS # null
+val_split: '../NTU/NTU60/xsub/NTU_val_seqs.npy'
+val_split_labels: '../NTU/NTU60/xsub/NTU_val_labels.npy'
+val_transforms: NTUMocoTDEvalTransformsTS # null
+drop_last: True
+shuffle: True
