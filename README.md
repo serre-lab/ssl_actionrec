@@ -98,8 +98,8 @@ base_cfg="configs/UCLA_BU_MOCO.yaml"
 exp_name="${NOW}_UCLA_BU_MOCO"
 
 
-exp_dir="/home/azerroug/prj_ssl_ucla_bu_tune/"
-path_db="/home/azerroug/prj_ssl_ucla_bu_tune/dbs"
+exp_dir="../prj_ssl_ucla_bu_tune/"
+path_db="../prj_ssl_ucla_bu_tune/dbs"
 
 
 CUDA_VISIBLE_DEVICES=$device \
