@@ -1,0 +1,47 @@
+neptune_key: ''
+neptune_project: 'Serre-Lab/self-sup'
+path_db: '../ssl_db'
+model: 'MocoPlusAETDSim'
+dataset: 'NTU_SSL'
+# trainer
+gpus: 1
+batch_size: 64 # best 64 # best 128
+max_epochs: 80
+num_workers: 6
+flush_logs_every_n_steps: 100
+log_every_n_steps: 50
+ckpt_period: 3
+# model
+gradient_clip_val: 5 # 25 # best 5
+optimizer: adam
+emb_dim: 128
+num_negatives: 65536 #65536
+encoder_momentum: 0.999
+softmax_temperature: 0.06 # 0.05 # 0.06
+learning_rate: 0.001
+momentum: 0.9
+weight_decay: 0.0001
+use_mlp: True
+output_feature: 'seqlast'
+decoder_input: 'seqlast'
+epochs: 150
+lr_decay_rate: 0.1
+td_loss_weight: 50
+bu_loss_weight: 1
+sim_loss_weight: 50 # 50
+#arch
+bidirectional: False
+input_dim: 150
+input_embedding: null
+hidden_dim: 512
+cell: 'GRU'
+num_layers: 1
+# data
+train_split: '/cifs/data/tserre_lrs/projects/prj_ssl_ntu/NTU60/NTU60/xsub/NTU_train_seqs.npy'
+train_split_labels: '/cifs/data/tserre_lrs/projects/prj_ssl_ntu/NTU60/NTU60/xsub/NTU_train_labels.npy'
+train_transforms: NTUMocoTDTrainTransformsTS # null
+val_split: '/cifs/data/tserre_lrs/projects/prj_ssl_ntu/NTU60/NTU60/xsub/NTU_val_seqs.npy'
+val_split_labels: '/cifs/data/tserre_lrs/projects/prj_ssl_ntu/NTU60/NTU60/xsub/NTU_val_labels.npy'
+val_transforms: NTUMocoTDEvalTransformsTS # null
+drop_last: True
+shuffle: True

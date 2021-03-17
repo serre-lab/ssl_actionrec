@@ -113,9 +113,9 @@ class Encoder(nn.Module):
         
         seq = self.embedding(seq.reshape([-1, f])).reshape([b, t, -1])
 
+        self.rnn.flatten_parameters()
         seq, _ = self.rnn(seq)
-        # seq = seq.permute(1, 0, 2).contiguous()  # n,b,h
-        
+
         return seq
 
 
@@ -130,8 +130,6 @@ class Decoder(nn.Module):
         elif cell == 'GRU':
             self.rnn = GRU(input_size=input_dim, hidden_size=rnn_hidden_dim, num_layers=num_layers, bidirectional=bidirectional, batch_first=True)
 
-        self.rnn.flatten_parameters()
-
         rnn_hidden_output = rnn_hidden_dim * 2 if bidirectional else hidden_dim
         
         self.output_lin = nn.Linear(rnn_hidden_output, output_dim)
@@ -139,6 +137,8 @@ class Decoder(nn.Module):
 
     def forward(self, seq):
         # seq = seq.permute(1, 0, 2).contiguous()  # t,b,h
+        self.rnn.flatten_parameters()
+
         seq, _ = self.rnn(seq)
         
         # seq = seq.permute(1, 0, 2).contiguous()  # b,t,h

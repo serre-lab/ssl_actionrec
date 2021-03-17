@@ -1,0 +1,47 @@
+neptune_key: ''
+neptune_project: 'Serre-Lab/self-sup'
+path_db: '../ssl_db'
+model: 'QCon'
+dataset: 'NTU_SSL'
+# trainer
+gpus: 1
+batch_size: 32
+max_epochs: 40
+num_workers: 8
+flush_logs_every_n_steps: 100
+log_every_n_steps: 50
+ckpt_period: 1
+# automatic_optimization: False
+# model
+# gradient_clip_val: 25
+optimizer: adam
+emb_dim: 128
+dict_size: 4096 #16384 #65536
+vector_momentum: 0.999
+softmax_temperature: 0.5 # 0.09
+learning_rate: 0.001 # 0.0008
+momentum: 0.9
+weight_decay: 0.0001
+use_mlp: True
+output_feature: 'seqlast'
+epochs: 150
+lr_decay_rate: 0.1
+loss_att_weight: 30
+loss_rep_weight: 0.033 # 0.033
+loss_emb_weight: 0
+# arch
+bidirectional: False
+input_dim: 150
+input_embedding: null
+hidden_dim: 512
+cell: 'GRU'
+num_layers: 1
+# data
+train_split: '/cifs/data/tserre_lrs/projects/prj_ssl_ntu/NTU60/NTU60/xsub/NTU_train_seqs.npy'
+train_split_labels: '/cifs/data/tserre_lrs/projects/prj_ssl_ntu/NTU60/NTU60/xsub/NTU_train_labels.npy'
+train_transforms: NTUQConTrainTransformsTS # null
+val_split: '/cifs/data/tserre_lrs/projects/prj_ssl_ntu/NTU60/NTU60/xsub/NTU_val_seqs.npy'
+val_split_labels: '/cifs/data/tserre_lrs/projects/prj_ssl_ntu/NTU60/NTU60/xsub/NTU_val_labels.npy'
+val_transforms: NTUQConEvalTransformsTS # null
+drop_last: True
+shuffle: True

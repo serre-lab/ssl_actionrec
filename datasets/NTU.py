@@ -75,7 +75,7 @@ class NTU_SSL(LightningDataModule):  # pragma: no cover
     def train_dataset(self, transform=''):
         
         transform = self.train_transforms if transform =='' else transform
-        
+
         if transform=='none':
             transforms = None
         elif transform is None:
@@ -84,13 +84,14 @@ class NTU_SSL(LightningDataModule):  # pragma: no cover
             transforms = get_transforms(transform)
         else:
             transforms = transform
+
         dataset = NTU_Dataset(self.train_split, self.train_split_labels, transforms = transforms, data=self.train_data, meta=self.train_meta, data_fraction=self.data_fraction)
         return dataset
 
     def val_dataset(self, transform=''):
         
         transform = self.val_transforms if transform =='' else transform
-        
+
         if transform=='none':
             transforms = None
         elif transform is None:
@@ -145,7 +146,7 @@ class NTU_SSL(LightningDataModule):  # pragma: no cover
             transforms = get_transforms(transform)
         else:
             transforms = transform
-        
+
         batch_size = self.batch_size if batch_size is None else batch_size
 
         dataset = NTU_Dataset(self.val_split, self.val_split_labels, transforms = transforms, data=self.val_data, meta=self.val_meta, data_fraction=self.data_fraction)

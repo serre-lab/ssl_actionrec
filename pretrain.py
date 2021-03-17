@@ -89,13 +89,19 @@ class KNNEval(Callback):
             
             knn_acc = modules.knn(train_features.numpy(), val_features.numpy(), train_target.numpy(), val_target.numpy(), nn=1)
             
+            # knn_acc = trainer.current_epoch
+            # knn_acc = torch.Tensor([trainer.current_epoch])[0]
+
+            # pl_module.log('knn_acc', knn_acc)
             trainer.logger.log_metrics({'knn_acc': knn_acc}, step=trainer.current_epoch) #
             trainer.logger_connector.callback_metrics.update({'knn_acc': knn_acc})
 
 def cli_main():
     
     argv = sys.argv[1:]
-
+    #argv = ['--config',     'configs/NTU_BUTD_CON.yaml',
+     #        '--exp_name',   'test',
+      #       '--exp_dir',    '../prj_ssl_exps/test']
 
     parser = argparse.ArgumentParser()
     
@@ -103,6 +109,8 @@ def cli_main():
 
     parser.add_argument('--exp_name', type=str, default='test', help='experiment name')
     parser.add_argument('--exp_dir', type=str, default='../experiments/', help='experiment output directory')
+    parser.add_argument('--neptune_key', type=str, default='', help='neptune user api key')
+    parser.add_argument('--neptune_project', type=str, default='', help='neptune project directory')
     parser.add_argument('--path_db', type=str, default='../dbs', help='neptune project directory')
 
     parser.add_argument('--model', type=str, default='MocoV2', help='self supervised training method')
@@ -138,7 +146,19 @@ def cli_main():
     with open(os.path.join(args.exp_dir, 'config.yaml'), 'w') as cfg_file:
         yaml.dump(args.__dict__, cfg_file)
 
-    logger = TensorBoardLogger(args.exp_dir) #, name="my_model"
+    if args.neptune_key != '':
+        logger = NeptuneLogger(
+            api_key=args.neptune_key,
+            project_name=args.neptune_project,
+            close_after_fit=False,
+            experiment_name=args.exp_name,  # Optional,
+            params=args.__dict__, # Optional,
+            tags=["pl"],  # Optional,
+            # upload_stderr=False,
+            # upload_stdout=False
+        )
+    else:
+        logger = TensorBoardLogger(args.exp_dir) #, name="my_model"
     
     datamodule = dataset_type(**args.__dict__)
     
@@ -153,16 +173,28 @@ def cli_main():
 
         args.__dict__.update({'resume_from_checkpoint': latest_ckpt})
 
-    model_checkpoint = pl.callbacks.ModelCheckpoint(filepath=args.exp_dir, save_top_k=3, mode='max', monitor='knn_acc', period=args.ckpt_period) # , filename='{epoch}-{knn_acc}' 
 
-    trainer = pl.Trainer.from_argparse_args(args, logger=logger, checkpoint_callback=model_checkpoint, callbacks=[KNNEval(period=args.ckpt_period)])    
+    #model_checkpoint = pl.callbacks.ModelCheckpoint(filepath=args.exp_dir, save_top_k=3, mode='max', monitor='knn_acc', period=args.ckpt_period) # , filename='{epoch}-{knn_acc}'
+    model_checkpoint = pl.callbacks.ModelCheckpoint(save_top_k=3, mode='max', monitor='knn_acc',
+                                                    period=args.ckpt_period)  # , filename='{epoch}-{knn_acc}'
+
+    trainer = pl.Trainer.from_argparse_args(args, logger=logger, checkpoint_callback=model_checkpoint, callbacks=[KNNEval(period=args.ckpt_period)])
+
+
+    # print(len(datamodule.val_dataset()))
+
+    
     trainer.fit(model, datamodule)
 
     best_ckpt = trainer.checkpoint_callback.best_model_path
-    best_model = model_type.load_from_checkpoint(checkpoint_path=best_ckpt)
-    pretrain_result = trainer.test(model=best_model, datamodule=datamodule)[0]
 
+    best_model = model_type.load_from_checkpoint(checkpoint_path=best_ckpt)
+    
+    # pretrain_result = trainer.test(model=best_model)[0]
+    pretrain_result = trainer.test(model=best_model, datamodule=datamodule)[0]
+    print(pretrain_result)
     lincls_results = lincls(args, best_model)
+
     
     print('test results')
     for k,v in lincls_results.items():
@@ -178,6 +210,14 @@ def cli_main():
 
     output_dict.update(pretrain_result)
     output_dict.update(lincls_results)
+    
+    if args.neptune_key != '':
+        for k, v in pretrain_result.items():
+            logger.experiment.log_metric(k, v)
+            
+        for k, v in lincls_results.items():
+            logger.experiment.log_metric(k, v)
+
 
     df = df.append(output_dict, ignore_index=True)
     df.to_csv(os.path.join(args.path_db, args.exp_name + '_db.csv'))
@@ -228,7 +268,10 @@ def lincls(args, model):
 
     datamodule = datasets.FeatureDataModule(train_features, train_target, val_features, val_target, num_workers=4, batch_size=batch_size)
     
-    model_checkpoint = pl.callbacks.ModelCheckpoint(filepath=os.path.join(args.exp_dir,'lincls'), save_top_k=1, mode='max', monitor='val_acc1_agg', period=1) # , filename='{epoch}-{knn_acc}' 
+    #model_checkpoint = pl.callbacks.ModelCheckpoint(filepath=os.path.join(args.exp_dir,'lincls'), save_top_k=1, mode='max', monitor='val_acc1_agg', period=1) # , filename='{epoch}-{knn_acc}'
+    model_checkpoint = pl.callbacks.ModelCheckpoint(save_top_k=1,
+                                                    mode='max', monitor='val_acc1_agg',
+                                                    period=1)  # , filename='{epoch}-{knn_acc}'
 
     trainer = pl.Trainer(max_epochs = 70, weights_summary=None, gpus=1, checkpoint_callback=model_checkpoint, progress_bar_refresh_rate=0)
     

@@ -198,9 +198,11 @@ class UCLA_Dataset(Dataset):
 
         self.data, self.label = get_data_list(data_path)
         self.transforms = transforms
-        self.data_fraction = data_fraction
         label = np.asarray(self.label)
         train_index = np.zeros(len(self.label))
+
+    def __len__(self):
+        return len(self.label)
 
     def __getitem__(self, index):
         sequence = self.data[index]
@@ -211,5 +213,5 @@ class UCLA_Dataset(Dataset):
 
         return sequence, label
 
-    def __len__(self):
-        return int(len(self.label)*self.data_fraction)
+    #def __len__(self):
+        #return int(len(self.label)*self.data_fraction)

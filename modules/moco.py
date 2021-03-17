@@ -238,6 +238,8 @@ class MocoV2(pl.LightningModule):
 
         k, output, target = self(input_q=input_1, input_k=input_2)
         loss = F.cross_entropy(output.float(), target.long())
+
+        print(loss)
         
         # dequeue and enqueue
         # self._dequeue_and_enqueue(k)
