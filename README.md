@@ -8,7 +8,7 @@
 
 ## Pretraining
 
-For pretraining and linear classification, choose a configuration from `configs/` and run `pretrain.py`. Overwrite parameters by adding them as arguments. The new configuration is saved as a yaml file in the experiment directory. Experiments are logged using tensorboard by default. If a user `neptune_key` is specified, the experiment is logged in neptune. A summary of the results is saved in a database as a csv file. Use `python join_db.py` to join all csv files into one containing all experiments.
+For pretraining and linear classification, choose a configuration from `configs/` and run `pretrain.py`. Overwrite parameters by adding them as arguments. The new configuration is saved as a yaml file in the experiment directory. Experiments are logged using tensorboard by default. A summary of the results is saved in a database as a csv file. Use `python join_db.py` to join all csv files into one containing all experiments.
 
 The following scirpt is an example:
 
